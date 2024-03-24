@@ -2,9 +2,15 @@ const mongoose = require("mongoose");
 const { DB_URL } = require("./ServerConfig");
 
 connectDB = async () => {
-  await mongoose.connect(DB_URL);
+  try {
+    await mongoose.connect(
+      "mongodb+srv://notesafe:vaibhav%40123K@cluster0.fsxrugd.mongodb.net/rbac_db_dev"
+    );
 
-  console.log("connected");
+    console.log("connected to database");
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 module.exports = connectDB;
