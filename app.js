@@ -1,9 +1,10 @@
 const express = require("express");
 const createHttpError = require("http-errors");
 const morgan = require("morgan");
-const { PORT } = require("./config/ServerConfig");
 const envObj = require("dotenv");
 envObj.config();
+const session = require("express-session");
+const connectFlash = require("connect-flash");
 
 const connectDB = require("./config/db");
 const app = express();
@@ -12,6 +13,24 @@ app.use(morgan("dev"));
 //to show html pages
 app.set("view engine", "ejs");
 
+//init session
+app.use(
+  session({
+    secret: "rocess.env.SessionSecret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      // secure: true,
+      httpOnly: true,
+    },
+  })
+);
+
+app.use(connectFlash());
+app.use((req, res, next) => {
+  res.locals.messages = req.flash();
+  next();
+});
 //to use public folder inside our application
 app.use(express.static("public"));
 

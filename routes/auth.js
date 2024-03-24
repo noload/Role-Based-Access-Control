@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const User = require("../models/user.model");
+
 router.get("/login", async (req, res, next) => {
   res.render("login");
 });
@@ -18,11 +19,11 @@ router.post("/register", async (req, res, next) => {
 
     if (existingUser) {
       return res.redirect("auth/register");
-      return;
     }
     const user = new User(req.body);
     await user.save();
-    return res.send(user);
+    req.flash("success", `${user.email} registred successfully`);
+    res.redirect("/auth/login");
   } catch (error) {
     next(error);
   }
