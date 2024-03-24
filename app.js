@@ -9,6 +9,7 @@ const passport = require("passport");
 const connectDB = require("./config/db");
 const app = express();
 app.use(morgan("dev"));
+const connectMongo = require("connect-mongodb-session");
 
 //to show html pages
 app.set("view engine", "ejs");
@@ -31,6 +32,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 require("./utils/passport.auth");
 
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  next();
+});
+
 app.use(connectFlash());
 app.use((req, res, next) => {
   res.locals.messages = req.flash();
@@ -46,7 +52,7 @@ connectDB();
 
 app.use("/", require("./routes/index"));
 app.use("/auth", require("./routes/auth"));
-app.use("/user", require("./routes/user"));
+app.use("/user", ensureAuthenticated, require("./routes/user"));
 
 app.use((req, res, next) => {
   next(createHttpError.NotFound());
@@ -61,3 +67,11 @@ app.use((error, req, res, next) => {
 app.listen(3000, () => {
   console.log(`server running on port 3000`);
 });
+
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/auth/login");
+  }
+}
