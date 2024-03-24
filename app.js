@@ -5,7 +5,7 @@ const envObj = require("dotenv");
 envObj.config();
 const session = require("express-session");
 const connectFlash = require("connect-flash");
-
+const passport = require("passport");
 const connectDB = require("./config/db");
 const app = express();
 app.use(morgan("dev"));
@@ -25,6 +25,11 @@ app.use(
     },
   })
 );
+
+//for password session authentication
+app.use(passport.initialize());
+app.use(passport.session());
+require("./utils/passport.auth");
 
 app.use(connectFlash());
 app.use((req, res, next) => {
@@ -51,7 +56,6 @@ app.use((error, req, res, next) => {
   error.status = error.status || 500;
   res.status(error.status);
   res.render("error_4ox", { error });
-  return res.send(error);
 });
 
 app.listen(3000, () => {

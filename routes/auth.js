@@ -1,13 +1,19 @@
 const router = require("express").Router();
 const User = require("../models/user.model");
+const passport = require("passport");
 
 router.get("/login", async (req, res, next) => {
   res.render("login");
 });
 
-router.post("/login", async (req, res, next) => {
-  res.send("login post");
-});
+router.post(
+  "/login",
+  passport.authenticate("local", {
+    successRedirect: "/user/profile",
+    failureRedirect: "/auth/login",
+    failureFlash: true,
+  })
+);
 
 router.get("/register", async (req, res, next) => {
   res.render("register");
@@ -30,7 +36,8 @@ router.post("/register", async (req, res, next) => {
 });
 
 router.get("/logout", async (req, res, next) => {
-  res.send("Logout");
+  req.logOut();
+  res.redirect("/");
 });
 
 module.exports = router;
